@@ -14,7 +14,11 @@ Harvest is defined as an accurate selection of patches for the tools from the Ha
 
 # Patches
 
-- Upgrade max vertex and index buffer size
+# Tool
+- Upgrade max vertex and index buffer size (96MB)
 - Remove max cache file size
 - Allow non power of two dimensions bitmaps
 - Force single player maps resource internalization
+
+# Sapien
+- Upgrade max animations count block (512)

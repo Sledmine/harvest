@@ -1,0 +1,8 @@
+[
+    {
+        "name": "upgradeMaxAnimationsCountBlock",
+        "address": "0x64E5B8",
+        "description": "Upgrade max animation count block size (512)",
+        "value": "0002"
+    }
+]
