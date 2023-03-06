@@ -5,5 +5,12 @@
         "description": "Upgrade max animation count block size to 512",
         "expected": "0001",
         "value": "0002"
+    },
+    {
+        "name": "upgradeMaxBitmapSize",
+        "address": "0x63B887",
+        "description": "Upgrade max bitmap size to 8192x8192",
+        "expected": "01",
+        "value": "04"
     }
 ]
