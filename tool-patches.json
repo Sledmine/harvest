@@ -2,25 +2,29 @@
     {
         "name": "upgradeMaxVertexSize",
         "address": "0x54D5A",
-        "description": "Upgrade max vertex and index buffer size (96MB)",
+        "description": "Upgrade max vertex and index buffer size to 96MiB",
+        "expected": "02",
         "value": "06"
     },
     {
         "name": "removeCacheFileSize",
         "address": "0x531D2",
         "description": "Force map compilation with size over max cache file size",
+        "expected": "7e",
         "value": "EB"
     },
     {
         "name": "allowNonPowerOfTwoDimensionsBitmaps",
         "address": "0x90B76",
         "description": "Force map compilation with no power of two dimensions bitmaps",
+        "expected": "75",
         "value": "EB"
     },
     {
         "name": "forceSingleplayerResourceInternalization",
         "address": "0x55451",
         "description": "Force singleplayer maps to internalize resource files",
+        "expected": "01",
         "value": "00"
     }
 ]

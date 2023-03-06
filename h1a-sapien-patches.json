@@ -1,0 +1,10 @@
+
+[
+    {
+        "name": "upgradeMaximumSpriteGroupCount",
+        "address": "0x377AE4",
+        "description": "Upgrade max sprite group count to 256",
+        "expected": "4000",
+        "value": "0001"
+    }
+]
