@@ -1,63 +1,75 @@
-local inspect = require "inspect"
-local glue = require "glue"
+local luna = require "lua_modules.luna"
 local json = require "cjson"
 
 ---@class patch
 ---@field name string
 ---@field address string
 ---@field description string
+---@field expected string
 ---@field value string
 
----@type patch[]
-local toolPatches = json.decode(glue.readfile("tool-patches.json", "t"))
-
----@type patch[]
-local sapienPatches = json.decode(glue.readfile("sapien-patches.json", "t"))
-
+---@param binaryName string
+---@param patches patch[]
 local function patchBinary(binaryName, patches)
     local sourceBinary = io.open(("bin/%s.exe"):format(binaryName), "rb")
-    local outputName
-    if (binaryName == "tool") then
-        outputName = "harvest"
+    local outputName = "harvest_" .. binaryName
+    
+    if not sourceBinary then
+        print("Error, \"" .. binaryName .. "\" not found in bin folder.")
     else
-        outputName = "harvest_" .. binaryName
-    end
-    local patchedBinary = io.open(("bin/%s.exe"):format(outputName), "wb")
-    if (sourceBinary and patchedBinary) then
-        print("Patching " .. binaryName .. ".exe...")
-        print("Output " .. outputName .. ".exe")
+        local patchedBinary = io.open(("build/%s.exe"):format(outputName), "wb")
+        assert(patchedBinary, "Error, could not open " .. outputName .. ".exe for writing.")
+
+        print("Patching " .. outputName .. "...")
         patchedBinary:write(sourceBinary:read("*a"))
         for _, patch in pairs(patches) do
-            -- Show current patch
-            print(patch.description, patch.address)
-
             -- Move patched binary cursor to specified address
             patchedBinary:seek("set", tonumber(patch.address))
 
             -- Get patch value info
-            local value = glue.string.fromhex(patch.value)
+            local value = patch.value:fromhex()
 
             -- Move source binary cursor to specified address
             sourceBinary:seek("set", tonumber(patch.address))
             local originalValue = sourceBinary:read(#value)
 
-            
-            print("Original value: " .. glue.string.tohex(tostring(originalValue)))
-            print("Raw value:", value)
-            print("String value:", glue.string.tohex(tostring(value)))
+            local expectedValue = patch.expected:fromhex()
+            local isPatchApplicable = originalValue ~= expectedValue
+            local patchStatus = isPatchApplicable and "FAIL" or "OK"
+            -- Show current patch
+            io.stderr:write(" - " .. patch.description .. " ")
+            --io.stderr:write("(" .. patch.address .. ") ")
+            io.stderr:write("[" .. patchStatus .. "]\n")
+            if patchStatus == "FAIL" then
+                io.stderr:write("   Expected: " .. tostring(expectedValue):tohex() .. "\n")
+                io.stderr:write("   Actual: " .. tostring(originalValue):tohex() .. "\n")
+            end
+            --print("Original value: " .. tostring(originalValue):tohex())
+            --print("Raw value:", value)
+            --print("String value:", tostring(value):tohex())
 
-            -- Patch output binary
-            patchedBinary:write(value)
-            --patchedBinary:seek("set", tonumber(patch.address))
-            --print("Written value:", patchedBinary:read(#value))
+            if not isPatchApplicable then
+                -- Patch output binary
+                patchedBinary:write(value)
+            end
+            -- patchedBinary:seek("set", tonumber(patch.address))
+            -- print("Written value:", patchedBinary:read(#value))
         end
         sourceBinary:close()
         patchedBinary:close()
-        print("Done!\n")
-    else
-        print("Error, " .. binaryName .. " not found.")
+        print("")
     end
 end
 
+---@type patch[]
+local toolPatches = json.decode(luna.file.read("tool-patches.json"))
+
+---@type patch[]
+local sapienPatches = json.decode(luna.file.read("sapien-patches.json"))
+
+---@type patch[]
+local h1aSapienPatches = json.decode(luna.file.read("h1a-sapien-patches.json"))
+
 patchBinary("tool", toolPatches)
 patchBinary("sapien", sapienPatches)
+patchBinary("h1a_sapien", h1aSapienPatches)
